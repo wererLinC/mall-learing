@@ -12,12 +12,24 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    /**
+     * 登录逻辑
+     * @param username
+     * @param password
+     * @return
+     */
     @Override
     public ServerResponse<User> login(String username, String password) {
         int resultCount = userMapper.checkUsername(username);
         if(resultCount == 0){
             return ServerResponse.createByErrorMessage("用户名不存在");
         }
-        return ServerResponse.createBySuccessMessage("陈工");
+        User user = userMapper.selectLogin(username,password);
+        if(user == null){
+            return ServerResponse.createByErrorMessage("密码错误");
+        }
+        user.setPassword(org.apache.commons.lang3.StringUtils.EMPTY);
+        return ServerResponse.createBySuccess("登录成功",user);
     }
 }
